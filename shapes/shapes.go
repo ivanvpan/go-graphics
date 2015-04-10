@@ -1,6 +1,7 @@
 package shapes
 
 import "math"
+import "fmt"
 
 import "github.com/veandco/go-sdl2/sdl"
 
@@ -13,7 +14,32 @@ type Shape interface {
 }
 
 type Point struct {
-	X, Y int32
+	X, Y float64
+}
+
+func (p Point) Rotate(angle int32) Point {
+	toRadians := func(angle int32) float64 {
+		return math.Pi * (float64(angle) / 180.0)
+	}
+	radAngle := toRadians(angle)
+	newX := int32(math.Ceil(float64(p.X)*math.Cos(radAngle) - float64(p.Y)*math.Sin(radAngle)))
+	newY := int32(math.Ceil(float64(p.Y)*math.Cos(radAngle) + float64(p.X)*math.Sin(radAngle)))
+	p.X = newX
+	p.Y = newY
+	fmt.Printf("%g %d %d\n", radAngle, p.X, p.Y)
+	return p
+}
+
+func (p Point) Translate(x, y int32) Point {
+	p.X = p.X + x
+	p.Y = p.Y + y
+	return p
+}
+
+func (p Point) RotateAround(angle, x, y int32) Point {
+	translated := p.Translate(-x, -y)
+	rotated := translated.Rotate(angle)
+	return rotated.Translate(x, y)
 }
 
 func (p Point) Draw(surface *sdl.Surface, color uint32) {

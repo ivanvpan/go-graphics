@@ -7,6 +7,7 @@ import "ivan/go-graphics/shapes"
 func clearSurface(srcSurface, destSurface *sdl.Surface) {
 	rect := sdl.Rect{0, 0, destSurface.W, destSurface.H}
 	srcSurface.FillRect(&rect, 0x09000000)
+	//srcSurface.FillRect(&rect, 0xff000000)
 	srcSurface.Blit(&rect, destSurface, &rect)
 }
 
@@ -33,9 +34,18 @@ func main() {
 	}
 
 	quit := false
-	var squareSize int32 = 1
-	var posX, posY int32 = 0, 0
-	var dirX, dirY int32 = 5, 5
+	polygon := shapes.Polygon{
+		[]shapes.Point{
+			shapes.Point{0, 0},
+			shapes.Point{300, 300},
+			shapes.Point{0, 300},
+		},
+	}
+	line := shapes.Line{
+		shapes.Point{0, 0},
+		shapes.Point{(winWidth - 1) / 2, winHeight - 1},
+	}
+	point := shapes.Point{200, 200}
 	for !quit {
 		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 			switch event.(type) {
@@ -46,30 +56,14 @@ func main() {
 
 		clearSurface(blittingSurface, surface)
 
-		posX += dirX
-		posY += dirY
-		line := shapes.Line{
-			shapes.Point{0, 0},
-			shapes.Point{(winWidth - 1) / 2, winHeight - 1},
-		}
 		line.Draw(surface, 0xffff0000)
-		polygon := shapes.Polygon{
-			[]shapes.Point{
-				shapes.Point{0, 0},
-				shapes.Point{300, 300},
-				shapes.Point{0, 300},
-			},
-		}
 		polygon.Draw(surface, 0xffff0000)
+		point.Draw(surface, 0xff00ffff)
+
+		point = point.RotateAround(5, winWidth/2, winHeight/2)
+
 		window.UpdateSurface()
 		sdl.Delay(1000 / 24)
-
-		if posX+squareSize+dirX > winWidth || posX+dirX < 0 {
-			dirX = -dirX
-		}
-		if posY+squareSize+dirY > winHeight || posY+dirY < 0 {
-			dirY = -dirY
-		}
 	}
 	sdl.Quit()
 }
