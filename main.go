@@ -2,7 +2,8 @@ package main
 
 import "github.com/veandco/go-sdl2/sdl"
 
-import "ivan/go-graphics/shapes"
+import "ivan/go-graphics/world"
+import "ivan/go-graphics/raster"
 
 func clearSurface(srcSurface, destSurface *sdl.Surface) {
 	rect := sdl.Rect{0, 0, destSurface.W, destSurface.H}
@@ -33,19 +34,10 @@ func main() {
 		panic(err)
 	}
 
+	vector := world.Vector{1, 1, 5}
+	point := raster.Rasterize(vector)
+
 	quit := false
-	polygon := shapes.Polygon{
-		[]shapes.Point{
-			shapes.Point{0, 0},
-			shapes.Point{300, 300},
-			shapes.Point{0, 300},
-		},
-	}
-	line := shapes.Line{
-		shapes.Point{0, 0},
-		shapes.Point{(winWidth - 1) / 2, winHeight - 1},
-	}
-	point := shapes.Point{200, 200}
 	for !quit {
 		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 			switch event.(type) {
@@ -56,11 +48,7 @@ func main() {
 
 		clearSurface(blittingSurface, surface)
 
-		line.Draw(surface, 0xffff0000)
-		polygon.Draw(surface, 0xffff0000)
-		point.Draw(surface, 0xff00ffff)
-
-		point = point.RotateAround(5, winWidth/2, winHeight/2)
+		point.Draw(surface, 0xffff0000)
 
 		window.UpdateSurface()
 		sdl.Delay(1000 / 24)

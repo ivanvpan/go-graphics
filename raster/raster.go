@@ -1,45 +1,16 @@
-package shapes
+package raster
 
 import "math"
-import "fmt"
 
 import "github.com/veandco/go-sdl2/sdl"
-
-func round(num float64) int32 {
-	return int32(num + math.Copysign(0.5, num))
-}
+import "ivan/go-graphics/world"
 
 type Shape interface {
 	draw(surface *sdl.Surface, color uint32)
 }
 
 type Point struct {
-	X, Y float64
-}
-
-func (p Point) Rotate(angle int32) Point {
-	toRadians := func(angle int32) float64 {
-		return math.Pi * (float64(angle) / 180.0)
-	}
-	radAngle := toRadians(angle)
-	newX := int32(math.Ceil(float64(p.X)*math.Cos(radAngle) - float64(p.Y)*math.Sin(radAngle)))
-	newY := int32(math.Ceil(float64(p.Y)*math.Cos(radAngle) + float64(p.X)*math.Sin(radAngle)))
-	p.X = newX
-	p.Y = newY
-	fmt.Printf("%g %d %d\n", radAngle, p.X, p.Y)
-	return p
-}
-
-func (p Point) Translate(x, y int32) Point {
-	p.X = p.X + x
-	p.Y = p.Y + y
-	return p
-}
-
-func (p Point) RotateAround(angle, x, y int32) Point {
-	translated := p.Translate(-x, -y)
-	rotated := translated.Rotate(angle)
-	return rotated.Translate(x, y)
+	X, Y int32
 }
 
 func (p Point) Draw(surface *sdl.Surface, color uint32) {
@@ -119,4 +90,12 @@ type Circle struct {
 }
 
 func (c Circle) Draw(surface *sdl.Surface, color uint32) {
+}
+
+func Rasterize(vector world.Vector) Point {
+	point := Point{
+		X: int32(math.Ceil(vector.X)),
+		Y: int32(math.Ceil(vector.Y)),
+	}
+	return point
 }
